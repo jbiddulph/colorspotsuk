@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   await prisma.users.create({
     data: {
       email: body.email,
-      name: body.name,
+      username: body.username,
     },
   }).then((response) => {
     user = response
