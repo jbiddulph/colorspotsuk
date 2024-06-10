@@ -13,9 +13,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
-  id         Int        @id @default(autoincrement())
-  email      String     @unique
-  username   String?
-  created_at DateTime   @default(now())
+model Items {
+  id              Int      @id @default(autoincrement())
+  item_name       String
+  item_description String
+  item_pic        String
+  item_status     String
+  item_type       String
+  latitude        Float
+  longitude       Float
+  reported_at     DateTime
+  user_id         String
 }

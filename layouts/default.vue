@@ -50,6 +50,7 @@ const links = [
   { text: 'Profile (protected)', href: '/auth/profile' },
   { text: 'Login', href: '/auth/login' },
   { text: 'Register', href: '/auth/register' },
+  { text: 'Add Item', href: '/items/create' }
 ]
 </script>
 
