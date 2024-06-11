@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container mx-auto flex items-center justify-center">
     <ItemsForm />
   </div>
 </template>

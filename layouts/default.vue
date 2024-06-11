@@ -23,7 +23,7 @@
         </nav>
       </div>
     </header>
-    <main class="flex items-center justify-center ">
+    <main class="flex mx-auto">
       <nuxt-page />
     </main>
     <footer class="bg-gray-800 text-white text-center p-4">

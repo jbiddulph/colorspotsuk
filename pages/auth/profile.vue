@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container mx-auto">
     <h1>Profile</h1>
     <p>{{user.id}}</p>
     <p>{{user.email}}</p>
