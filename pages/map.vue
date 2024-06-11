@@ -45,10 +45,13 @@ useHead({
 definePageMeta({
   middleware: ["auth"]
 })
+
+const config = useRuntimeConfig();
+const baseURL = config.public.baseURL;
 const items = ref([]);
 
 const getItems = async () => {
-  return await $fetch('/api/items')
+  return await $fetch(baseURL + '/api/items')
 }
 
 items.value = await getItems();

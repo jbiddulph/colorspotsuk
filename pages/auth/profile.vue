@@ -47,6 +47,8 @@ useHead({
 definePageMeta({
   middleware: ["auth"]
 })
+const config = useRuntimeConfig();
+const baseURL = config.public.baseURL;
 const items = ref([]);
 const user = useSupabaseUser();
 
@@ -56,7 +58,7 @@ const logout = async () => {
   try {
     const { error } = await client.auth.signOut()
     if (error) throw error;
-    router.push("/auth/login");
+    router.push(baseURL + "/auth/login");
   } catch (error) {
     console.log(error);
   }
