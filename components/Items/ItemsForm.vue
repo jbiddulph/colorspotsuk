@@ -53,8 +53,6 @@
 
 <script setup lang="ts">
 const router = useRouter();
-const config = useRuntimeConfig();
-const baseURL = config.public.baseURL;
 const user = useSupabaseUser();
 const supabase = useSupabaseClient();
 const errorMessage = ref("");
@@ -188,7 +186,7 @@ const maxDate = computed(() => {
 // ADD ITEM
 const addItem = async (item: any) => {
   if (item) {
-    return await $fetch(baseURL + '/api/items', {
+    return await $fetch('/api/items', {
       method: "POST",
       body: item
     });
