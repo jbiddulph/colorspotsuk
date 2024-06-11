@@ -111,7 +111,7 @@ const addMarkers = () => {
         .setLngLat([item.longitude, item.latitude])
         .addTo(map.value);
 
-      const imageUrl = item.item_pic ? `/${item.item_pic}` : 'storage/avatars/default.jpg';
+      const imageUrl = item.item_pic ? `/${item.item_pic}` : 'public/images/public/items/default.jpg';
       const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
         <div class="w-auto h-32 flex flex-row p-0 m-0">
           <div>

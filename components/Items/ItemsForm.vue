@@ -10,7 +10,7 @@
             <span class="bg-white/70 pb-2 text-center">Item Pic</span>
           </label>
           <input type="file" @change="changePic" id="item_pic" hidden>
-          <img class="object-cover w-28 h-28" :src="form.preview ?? '/storage/avatars/default.jpg'" />
+          <img class="object-cover w-28 h-28" :src="form.preview ?? `${config.public.supabase.url}/storage/v1/object/public/images/public/items/default.jpg`" />
         </div>
         <p class="error mt-2">{{ form.errors?.item_pic }}</p>
       </div>
