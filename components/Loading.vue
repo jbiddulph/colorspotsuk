@@ -1,6 +1,7 @@
 <template>
   <div>
-    <p>About</p>
+    The page is loading
+    
   </div>
 </template>
 
