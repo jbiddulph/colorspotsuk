@@ -1,10 +1,9 @@
 <template>
 <div class="flex flex-col">
   <Head title="Register" />
-  <h1 class="title"><i><u>Lost</u></i> or<br /><i><u>Found</u></i> something?<br /> just <i><u>Report</u></i> it!</h1>
+  <h1 class="title text-center"><i><u>Lost</u></i> or<br /><i><u>Found</u></i> something?<br /> just <i><u>Report</u></i> it!</h1>
   <div class="w-full mx-auto bg-slate-100 p-3 rounded-lg">
     <form @submit.prevent="submitForm">
-      {{ user.id }}
       <div class="grid place-items-center">
         <div class="relative w-28 h-28 rounded-full overflow-hidden border border-slate-300">
           <label for="item_pic" class="absolute inset-0 grid content-end cursor-pointer">
@@ -33,18 +32,19 @@
         </select>
         <p class="error mt-2">{{ form.errors?.item_type }}</p>
       </div>
+      <TextInput name="Date" type="date" class="w-100" v-model="form.reported_on" :message="form.errors?.reported_on" />
+      <TextInput name="Time" type="time" v-model="form.reported_at" :message="form.errors?.reported_at" />
       <div id="layout">
-        <Map :height="350" :width="320" @update:coordinates="updateCoordinates" class="mt-4" />
+        <Map :height="350" :width="272" @update:coordinates="updateCoordinates" class="mt-4" />
       </div>
       <input type="hidden" v-model="form.latitude" />
       <input type="hidden" v-model="form.longitude" />
-      <TextInput name="Date" type="date" class="w-100" v-model="form.reported_date" :message="form.errors?.reported_date" />
-      <TextInput name="Time" type="time" v-model="form.reported_time" :message="form.errors?.reported_time" />
+      
       <div v-if="errorMessage.length > 0">
         {{ errorMessage }}
       </div>
       <div>
-        <button class="primary-btn" :disabled="form.processing">Report</button>
+        <button class="bg-green-500 text-white font-bold primary-btn mt-12 w-full p-4 rounded mb-4" :disabled="form.processing">Report it now</button>
       </div>
     </form>
   </div>
@@ -64,8 +64,8 @@ const form = reactive({
   item_type: '',
   latitude: null,
   longitude: null,
-  reported_date: '',
-  reported_time: '',
+  reported_on: '',
+  reported_at: '',
   item_pic: null,
   preview: '',
   errors: {
@@ -75,8 +75,8 @@ const form = reactive({
     item_type: '',
     latitude: '',
     longitude: '',
-    reported_date: '',
-    reported_time: '',
+    reported_on: '',
+    reported_at: '',
     item_pic: ''
   },
   processing: false
@@ -95,7 +95,24 @@ const changePic = (e: Event) => {
     form.preview = URL.createObjectURL(input.files[0]);
   }
 };
+// Format date
+const formatDate = (date: any) => {
+  const d = new Date(date);
+  if (isNaN(d.getTime())) {
+    // If the date is invalid, return an empty string or handle the error accordingly
+    console.error('Invalid date:', date);
+    return '';
+  }
 
+  let month = '' + (d.getMonth() + 1);
+  let day = '' + d.getDate();
+  const year = d.getFullYear();
+
+  if (month.length < 2) month = '0' + month;
+  if (day.length < 2) day = '0' + day;
+
+  return [year, month, day].join('-');
+};
 // Define the submit method to handle form submission
 const submitForm = async () => {
   const fileName = Math.floor(Math.random() * 10000000000000000);
@@ -123,6 +140,13 @@ const submitForm = async () => {
     form.processing = false;
     return;
   }
+  
+  const formattedDate = formatDate(form.reported_on);
+  if (!formattedDate) {
+    errorMessage.value = 'Invalid reported date';
+    form.processing = false;
+    return;
+  }
 
   const body = {
     item_name: form.item_name,
@@ -131,12 +155,14 @@ const submitForm = async () => {
     item_type: form.item_type,
     latitude: parseFloat(form.latitude),
     longitude: parseFloat(form.longitude),
-    reported_at: new Date(form.reported_date).toISOString(),
+    reported_on: formattedDate,
+    reported_at: form.reported_at,
     item_pic: data.path,
     user_id: user.value.id
   };
 
   try {
+    console.log("X body: ", body)
     await addItem(body);
     router.push('/items');
   } catch (error) {
@@ -148,6 +174,14 @@ const submitForm = async () => {
   }
 };
 
+// Calculate the max date string (YYYY-MM-DD) for the max attribute
+const maxDate = computed(() => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = (today.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+  const day = today.getDate().toString().padStart(2, '0');
+  return `${day}/${month}/${year}`;
+});
 
 // ADD ITEM
 const addItem = async (item: any) => {
@@ -176,7 +210,4 @@ const updateCoordinates = ({ lng, lat }: { lng: number, lat: number }) => {
   height: 350px;
   margin-bottom: 20px;
 }
-/* .mapboxgl-ctrl-attrib-inner {
-  display: none;
-} */
 </style>

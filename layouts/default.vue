@@ -3,7 +3,10 @@
   <div>
     <header class="bg-gray-800 text-white">
       <div class="container mx-auto flex justify-between items-center p-4">
-        <h1 class="text-xl font-bold">My Theme Header</h1>
+        <div class="flex items-center">
+          <img src="/public/colorspots-logo.png" alt="Logo" class="w-10 h-10 mr-4" />
+          <h1 class="text-xl font-bold">ColorSpots.uk</h1>
+        </div>
         <nav>
           <button @click="toggleMenu" class="block md:hidden">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -30,11 +33,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
+const user = useSupabaseUser();
 const isMenuOpen = ref(false)
 const route = useRoute()
+const links = ref([]);
 
 function toggleMenu() {
   isMenuOpen.value = !isMenuOpen.value
@@ -44,14 +49,22 @@ function isActive(path) {
   return route.path === path
 }
 
-const links = [
-  { text: 'Home', href: '/' },
-  { text: 'Auth', href: '/about' },
-  { text: 'Profile (protected)', href: '/auth/profile' },
-  { text: 'Login', href: '/auth/login' },
-  { text: 'Register', href: '/auth/register' },
-  { text: 'Add Item', href: '/items/create' }
-]
+watchEffect(() => {
+  if (user.value) {
+    links.value = [
+      { text: 'Home', href: '/' },
+      { text: 'Map', href: '/map' },
+      { text: 'Profile', href: '/auth/profile' },
+      { text: 'Add Item', href: '/items/create' }
+    ];
+  } else {
+    links.value = [
+      { text: 'Home', href: '/' },
+      { text: 'Login', href: '/auth/login' },
+      { text: 'Register', href: '/auth/register' },
+    ];
+  }
+});
 </script>
 
 <style>

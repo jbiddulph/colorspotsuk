@@ -22,6 +22,7 @@ model Items {
   item_type       String
   latitude        Float
   longitude       Float
-  reported_at     DateTime
+  reported_on     String
+  reported_at     String
   user_id         String
 }

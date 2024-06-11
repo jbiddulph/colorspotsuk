@@ -11,19 +11,21 @@
 
     <!-- end form -->
 
-    <h2>Users</h2>
+    <h2>Items</h2>
     <table>
       <thead>
         <th>ID</th>
         <th>Name</th>
-        <th>Email</th>
+        <th>Status</th>
+        <th>Type</th>
         <th>Actions</th>
       </thead>
       <tbody>
-        <tr v-for="user in users" :key="user.id" class="border">
-          <td>{{user.id}}</td>
-          <td>{{user.name}}</td>
-          <td>{{user.email}}</td>
+        <tr v-for="item in items" :key="item.id" class="border">
+          <td>{{item.id}}</td>
+          <td>{{item.item_name}}</td>
+          <td>{{item.item_status}}</td>
+          <td>{{item.item_type}}</td>
           <td>
             <button class="bg-amber-500 hover:bg-gray-400 text-gray-200 font-bold py-2 px-4 rounded inline-flex items-center mr-2">
               <span>Edit</span>
@@ -40,12 +42,12 @@
 
 <script setup lang="ts">
 useHead({
-  title: "Users page"
+  title: "Items page"
 })
 definePageMeta({
   middleware: ["auth"]
 })
-const users = ref([]);
+const items = ref([]);
 const user = useSupabaseUser();
 
 const client = useSupabaseClient();
@@ -60,13 +62,13 @@ const logout = async () => {
   }
 }
 
-// GET ALL USERS
-const getUsers = async () => {
-  return await $fetch('/api/users')
+// GET ALL ITEMS
+const getItems = async () => {
+  return await $fetch('/api/items')
 }
 
-users.value = await getUsers();
-console.log("users", users);
+items.value = await getItems();
+console.log("items", items);
 </script>
 
 <style scoped>

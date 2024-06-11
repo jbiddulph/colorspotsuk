@@ -16,12 +16,13 @@ export default defineEventHandler(async (event) => {
         item_type: body.item_type,
         latitude: body.latitude,
         longitude: body.longitude,
+        reported_on: body.reported_on,
         reported_at: body.reported_at,
         user_id: body.user_id
       }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating item:', error);
     throw createError({
       statusCode: 400,
