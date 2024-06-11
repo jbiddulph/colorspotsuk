@@ -45,7 +45,6 @@ useHead({
 definePageMeta({
   middleware: ["auth"]
 })
-
 const items = ref([]);
 
 const getItems = async () => {
