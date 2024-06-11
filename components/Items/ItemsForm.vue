@@ -35,7 +35,7 @@
       <TextInput name="Date" type="date" class="w-100" v-model="form.reported_on" :message="form.errors?.reported_on" />
       <TextInput name="Time" type="time" v-model="form.reported_at" :message="form.errors?.reported_at" />
       <div id="layout">
-        <Map :height="350" :width="272" @update:coordinates="updateCoordinates" class="mt-4" />
+        <Map :height="350" :width="362" @update:coordinates="updateCoordinates" class="mt-4" />
       </div>
       <input type="hidden" v-model="form.latitude" />
       <input type="hidden" v-model="form.longitude" />

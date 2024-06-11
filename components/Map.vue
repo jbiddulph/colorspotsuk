@@ -1,7 +1,8 @@
 <template>
   <div>
     <div v-if="showSidebar" id="sidebar">Lng: {{ location.lng }} | Lat: {{ location.lat }} | Z: {{ location.zoom }}</div>
-    <div ref="mapContainer" :style="{ height: `${props.height}px`, width: `${props.width}px` }" class="map-container">
+    <!-- <div ref="mapContainer" :style="{ height: `${props.height}px`, width: `${props.width}px` }" class="map-container"> -->
+      <div ref="mapContainer" :class="mapContainerClasses">
       <!-- Add crosshair element -->
       <div class="crosshair"></div>
     </div>
@@ -13,8 +14,14 @@ import mapboxgl from "mapbox-gl";
 import { ref, reactive, onMounted, onUnmounted, watch } from 'vue';
 
 const props = defineProps({
-  height: Number,
-  width: Number,
+  width: {
+    type: Number,
+    required: true
+  },
+  height: {
+    type: Number,
+    required: true
+  },
   data: {
     type: Array,
     default: () => []
@@ -61,7 +68,17 @@ const getUserLocation = () => {
     }
   });
 };
-
+const mapContainerClasses = computed(() => {
+  return [
+    'map-container',
+    'w-[360px] mx-auto',
+    'h-[400px]',
+    'md:w-full',
+    'md:h-100',
+    // `md:w-[${props.width}px]`,
+    // `md:h-[${props.height}px]`
+  ].join(' ');
+});
 const createMarkerElement = (color: string) => {
   console.log("Creating marker element with color:", color); // Debug log
   const markerElement = document.createElement('div');
@@ -96,7 +113,7 @@ const addMarkers = () => {
 
       const imageUrl = item.item_pic ? `/${item.item_pic}` : 'storage/avatars/default.jpg';
       const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
-        <div class="bg-red-500 w-auto h-32 flex flex-row p-0 m-0">
+        <div class="w-auto h-32 flex flex-row p-0 m-0">
           <div>
             <img src="${config.public.supabase.url}/storage/v1/object/public/images/${imageUrl}" alt="Avatar" class="m-0 pr-2 h-32">
           </div>
@@ -176,10 +193,13 @@ onUnmounted(() => {
   z-index: 0;
 }
 .map-marker {
-  z-index: 10000000; /* Adjust the value based on your specific needs */
+  z-index: 1000; /* Adjust the value based on your specific needs */
+}
+.mapboxgl-popup {
+  z-index: 111;
 }
 .mapboxgl-popup-content {
-  width: 450px;
+  width: 260px;
   display: flex;
   background-color: #fff; /* Example background color */
   padding: 10px; /* Example padding */
