@@ -5,20 +5,22 @@
       <Loaded />
     </div>
     <header class="bg-gray-800 text-white">
-      <div class="container mx-auto flex justify-between items-center p-4">
-        <div class="flex items-center">
-          <img src="/public/colorspots-logo.png" alt="Logo" class="w-10 h-10 mr-4" />
-          <h1 class="text-xl font-bold">ColorSpots.uk</h1>
-        </div>
-        <nav>
+      <div class="container mx-auto flex justify-between items-center p-4 flex-col md:flex-row">
+        <div class="flex flex-row justify-between w-full">
+          <div class="flex items-center">
+            <img src="/public/colorspots-logo.png" alt="Logo" class="w-10 h-10 mr-4" />
+            <h1 class="text-xl font-bold">ColorSpots.uk</h1>
+          </div>
           <button @click="toggleMenu" class="block md:hidden">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
           </button>
+        </div>
+        <nav>
           <ul :class="{'block': isMenuOpen, 'hidden': !isMenuOpen}" class="md:flex md:items-center md:space-x-4">
             <li v-for="link in links" :key="link.text">
-              <NuxtLink :href="link.href" :class="['block py-2 px-4 rounded', { 'bg-gray-700': isActive(link.href) }]">
+              <NuxtLink :href="link.href" :class="['block py-2 px-4 rounded', { 'bg-gray-700': isActive(link.href) }]" @click="closeMenuOnLinkClick">
                 {{ link.text }}
               </NuxtLink>
             </li>
@@ -37,21 +39,27 @@
 
 <script setup>
 const appStore = useAppStore();
-const { hasLoaded } = storeToRefs(appStore)
+const { hasLoaded } = storeToRefs(appStore);
 
-import { useRoute } from 'vue-router'
+import { useRoute } from 'vue-router';
 
 const user = useSupabaseUser();
-const isMenuOpen = ref(false)
-const route = useRoute()
+const isMenuOpen = ref(false);
+const route = useRoute();
 const links = ref([]);
 
 function toggleMenu() {
-  isMenuOpen.value = !isMenuOpen.value
+  isMenuOpen.value = !isMenuOpen.value;
+}
+
+function closeMenuOnLinkClick() {
+  if (window.innerWidth < 768) {
+    isMenuOpen.value = false;
+  }
 }
 
 function isActive(path) {
-  return route.path === path
+  return route.path === path;
 }
 
 watchEffect(() => {
@@ -60,7 +68,7 @@ watchEffect(() => {
       { text: 'Home', href: '/' },
       { text: 'Map', href: '/map' },
       { text: 'Profile', href: '/auth/profile' },
-      { text: 'Add Item', href: '/items/create' }
+      { text: 'Add Item', href: '/items/create' },
     ];
   } else {
     links.value = [

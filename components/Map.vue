@@ -98,11 +98,13 @@ const addMarkers = () => {
     props.data.forEach(item => {
       if (props.filter && item.item_status !== props.filter) return;
 
-      let markerColor = '#2fc5e0';
+      let markerColor = '#ff9900';
       if (item.item_status === 'Lost') {
-        markerColor = '#ff0066';
+        markerColor = '#e40000';
       } else if (item.item_status === 'Found') {
-        markerColor = 'green';
+        markerColor = '#33cc33';
+      } else if (item.item_status === 'Report') {
+        markerColor = '#2fc5e0';
       }
 
       const markerElement = createMarkerElement(markerColor);

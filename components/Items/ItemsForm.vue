@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col">
     <Head title="Register" />
-    <h1 class="title text-center"><i><u>Lost</u></i> or<br /><i><u>Found</u></i> something?<br /> just <i><u>Report</u></i> it!</h1>
+    <h1 class="my-4 text-center text-2xl"><i><u><b>Lost</b></u></i> or<br /><i><u><b>Found</b></u></i> something?<br /> just <i><u><b>Report</b></u></i> it!</h1>
     <div class="w-full mx-auto bg-slate-100 p-3 rounded-lg">
       <form @submit.prevent="submitForm">
         <div class="grid place-items-center">
@@ -180,9 +180,8 @@ const submitForm = async () => {
     errorMessage.value = 'Please fix the errors in the form';
     return;
   }
-
-  // Existing logic for file upload and form processing
   hasLoaded.value = true;
+  // Existing logic for file upload and form processing
   const fileName = Math.floor(Math.random() * 10000000000000000);
   const { data, error } = await supabase.storage.from("images").upload("public/items/" + fileName, form.item_pic);
 
@@ -220,6 +219,7 @@ const submitForm = async () => {
 
   try {
     await addItem(body);
+    hasLoaded.value = false;
     router.push('/items');
   } catch (error) {
     await supabase.storage.from("images").remove([data.path]);
