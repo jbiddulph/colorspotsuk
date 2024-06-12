@@ -7,9 +7,9 @@
       :checked="modelValue === value"
       @change="$emit('update:modelValue', value)"
     />
-    <label class="ml-6" :for="id" :style="{ backgroundColor: modelValue === value ? selectedColor : defaultColor }">
-      <span class="ml-8" v-if="value === ''">All</span>
-      <span class="ml-8" v-else>{{ value }}</span>
+    <label class="ml-4" :for="id" :style="{ backgroundColor: modelValue === value ? selectedColor : defaultColor }">
+      <span class="ml-7" v-if="value === ''">All</span>
+      <span class="ml-7" v-else>{{ value }}</span>
     </label>
     
   </div>

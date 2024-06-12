@@ -3,7 +3,7 @@
       <div id="layout" class="flex flex-col">
         <div class="my-4 flex flex-row">
           <div class="filter-controls flex flex-row justify-evenly w-full">
-            <div class="flex flex-row w-full ml-6">
+            <div class="flex flex-row w-full md:w-1/2 md:mx-auto">
               <RadioButton
                 v-for="option in filterOptions"
                 :key="option.id"

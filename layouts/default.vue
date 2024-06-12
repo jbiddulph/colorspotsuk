@@ -18,7 +18,7 @@
           </button>
         </div>
         <nav>
-          <ul :class="{'block': isMenuOpen, 'hidden': !isMenuOpen}" class="md:flex md:items-center md:space-x-4">
+          <ul :class="{'block': isMenuOpen, 'hidden': !isMenuOpen}" class="md:flex md:items-center md:space-x-4 mt-6">
             <li v-for="link in links" :key="link.text">
               <NuxtLink :href="link.href" :class="['block py-2 px-4 rounded', { 'bg-gray-700': isActive(link.href) }]" @click="closeMenuOnLinkClick">
                 {{ link.text }}
@@ -103,6 +103,6 @@ footer {
 }
 
 main {
-  min-height: calc(100vh - 100px); /* Adjust this value according to your header and footer height */
+  min-height: calc(100vh - 156px); /* Adjust this value according to your header and footer height */
 }
 </style>
