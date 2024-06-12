@@ -17,8 +17,8 @@
           </div>
           
         </div>
-        <p v-if="selectedFilter" class="text-center mb-2">You are viewing {{ selectedFilter.toLowerCase() }} spots!</p>
-        <p v-if="!selectedFilter" class="text-center mb-2">You are viewing all spots!</p>
+        <p v-if="selectedFilter" class="text-center mb-2">You are viewing <strong>{{ selectedFilter.toLowerCase() }}</strong> spots!</p>
+        <p v-if="!selectedFilter" class="text-center mb-2">You are viewing <strong>all</strong> spots!</p>
         <div>
           <Map :height="500" :width="1280" :showSidebar="false" :data="items" :filter="selectedFilter" />
           <!-- <Map :height="460" :width="1280" :data="items.data" :filter="selectedFilter" /> -->

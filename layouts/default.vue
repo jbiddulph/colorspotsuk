@@ -18,8 +18,8 @@
           </button>
         </div>
         <nav>
-          <ul :class="{'block': isMenuOpen, 'hidden': !isMenuOpen}" class="md:flex md:items-center md:space-x-4 mt-6">
-            <li v-for="link in links" :key="link.text">
+          <ul :class="{'block': isMenuOpen, 'hidden': !isMenuOpen}" class="md:flex md:items-center md:space-x-4 mt-4 md:mt-0">
+            <li v-for="link in links" :key="link.text" class="flex-none">
               <NuxtLink :href="link.href" :class="['block py-2 px-4 rounded', { 'bg-gray-700': isActive(link.href) }]" @click="closeMenuOnLinkClick">
                 {{ link.text }}
               </NuxtLink>
