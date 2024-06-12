@@ -1,6 +1,9 @@
 <!-- layouts/default.vue -->
 <template>
   <div>
+    <div v-if="hasLoaded">
+      <Loaded />
+    </div>
     <header class="bg-gray-800 text-white">
       <div class="container mx-auto flex justify-between items-center p-4">
         <div class="flex items-center">
@@ -33,7 +36,9 @@
 </template>
 
 <script setup>
-import { ref, computed, watchEffect } from 'vue'
+const appStore = useAppStore();
+const { hasLoaded } = storeToRefs(appStore)
+
 import { useRoute } from 'vue-router'
 
 const user = useSupabaseUser();

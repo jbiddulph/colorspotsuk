@@ -1,70 +1,65 @@
 <template>
-<div class="flex flex-col">
-  <Head title="Register" />
-  <div v-if="added" class="bg-slate-500 bg-opacity-50 absolute top-0 left-0 w-screen h-screen flex items-center justify-center">
-    <svg class="animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 4.243 3.134 7.775 7.219 8.485l.781-3.194z"></path>
-    </svg>
-  </div>
-
-
-  <h1 class="title text-center"><i><u>Lost</u></i> or<br /><i><u>Found</u></i> something?<br /> just <i><u>Report</u></i> it!</h1>
-  <div class="w-full mx-auto bg-slate-100 p-3 rounded-lg">
-    <form @submit.prevent="submitForm">
-      <div class="grid place-items-center">
-        <div class="relative w-28 h-28 rounded-full overflow-hidden border border-slate-300">
-          <label for="item_pic" class="absolute inset-0 grid content-end cursor-pointer">
-            <span class="bg-white/70 pb-2 text-center">Item Pic</span>
-          </label>
-          <input type="file" @change="changePic" id="item_pic" hidden>
-          <img class="object-cover w-28 h-28" :src="form.preview ?? `${config.public.supabase.url}/storage/v1/object/public/images/public/items/default.jpg`" />
+  <div class="flex flex-col">
+    <Head title="Register" />
+    <h1 class="title text-center"><i><u>Lost</u></i> or<br /><i><u>Found</u></i> something?<br /> just <i><u>Report</u></i> it!</h1>
+    <div class="w-full mx-auto bg-slate-100 p-3 rounded-lg">
+      <form @submit.prevent="submitForm">
+        <div class="grid place-items-center">
+          <div class="relative w-28 h-28 rounded-full overflow-hidden border border-slate-300">
+            <label for="item_pic" class="absolute inset-0 grid content-end cursor-pointer">
+              <span class="bg-white/70 pb-2 text-center">Item Pic</span>
+            </label>
+            <input type="file" @change="changePic" id="item_pic" hidden>
+            <img class="object-cover w-28 h-28" :src="form.preview ?? `${config.public.supabase.url}/storage/v1/object/public/images/public/items/default.jpg`" />
+          </div>
+          <small class="text-red-700 mt-2">{{ form.errors.item_pic }}</small>
         </div>
-        <p class="error mt-2">{{ form.errors?.item_pic }}</p>
-      </div>
-      <TextInput name="Name" v-model="form.item_name" :message="form.errors?.item_name" />
-      <TextInput name="Description" v-model="form.item_description" :message="form.errors?.item_description" />
-      <!-- Status dropdown -->
-      <div class="mb-6">
-        <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-        <select id="status" v-model="form.item_status" class="w-[270px] flex mt-1 block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-          <option v-for="status in statuses" :key="status">{{ status }}</option>
-        </select>
-        <p class="error mt-2">{{ form.errors?.item_status }}</p>
-      </div>
-      <!-- Type dropdown -->
-      <div class="mb-6">
-        <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
-        <select id="type" v-model="form.item_type" class="w-[270px] flex mt-1 block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-          <option v-for="type in typesMap[form.item_status] ?? []" :key="type">{{ type }}</option>
-        </select>
-        <p class="error mt-2">{{ form.errors?.item_type }}</p>
-      </div>
-      <TextInput name="Date" type="date" class="w-100" v-model="form.reported_on" :message="form.errors?.reported_on" />
-      <TextInput name="Time" type="time" v-model="form.reported_at" :message="form.errors?.reported_at" />
-      <div id="layout">
-        <Map :height="350" :width="362" @update:coordinates="updateCoordinates" class="mt-4" />
-      </div>
-      <input type="hidden" v-model="form.latitude" />
-      <input type="hidden" v-model="form.longitude" />
-      
-      <div v-if="errorMessage.length > 0">
-        {{ errorMessage }}
-      </div>
-      <div>
-        <button class="bg-green-500 text-white font-bold primary-btn mt-12 w-full p-4 rounded mb-4" :disabled="form.processing">Report it now</button>
-      </div>
-    </form>
+        <TextInput name="Name" v-model="form.item_name" :message="form.errors.item_name" />
+        <TextInput name="Description" v-model="form.item_description" :message="form.errors.item_description" />
+        <!-- Status dropdown -->
+        <div class="mb-6">
+          <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+          <select id="status" v-model="form.item_status" class="w-[270px] flex mt-1 block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <option v-for="status in statuses" :key="status">{{ status }}</option>
+          </select>
+          <small class="text-red-700 mt-2">{{ form.errors.item_status }}</small>
+        </div>
+        <!-- Type dropdown -->
+        <div class="mb-6">
+          <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
+          <select id="type" v-model="form.item_type" class="w-[270px] flex mt-1 block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <option v-for="type in typesMap[form.item_status] ?? []" :key="type">{{ type }}</option>
+          </select>
+          <small class="text-red-700 mt-2">{{ form.errors.item_type }}</small>
+        </div>
+        <TextInput name="Date" type="date" class="w-100" v-model="form.reported_on" :message="form.errors.reported_on" />
+        <TextInput name="Time" type="time" v-model="form.reported_at" :message="form.errors.reported_at" />
+        <div id="layout">
+          <Map :height="350" :width="285" @update:coordinates="updateCoordinates" class="mt-4" />
+        </div>
+        <input type="hidden" v-model="form.latitude" />
+        <input type="hidden" v-model="form.longitude" />
+
+        <div v-if="errorMessage.length > 0">
+          {{ errorMessage }}
+        </div>
+        <div>
+          <button class="bg-green-500 text-white font-bold primary-btn mt-32 w-full p-4 rounded mb-4" :disabled="form.processing">Report it now</button>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
 </template>
 
+
 <script setup lang="ts">
+
+const appStore = useAppStore();
 const router = useRouter();
 const user = useSupabaseUser();
 const supabase = useSupabaseClient();
 const errorMessage = ref("");
-const added = ref(false);
+const { hasLoaded } = storeToRefs(appStore)
 // Define the form and its initial values
 const form = reactive({
   item_name: '',
@@ -122,11 +117,74 @@ const formatDate = (date: any) => {
 
   return [year, month, day].join('-');
 };
+// Add validation functions to your script setup
+const validateField = (field: string, value: any) => {
+  switch (field) {
+    case 'item_name':
+      if (!value) return 'Item name is required';
+      break;
+    case 'item_description':
+      if (!value) return 'Item description is required';
+      break;
+    case 'item_status':
+      if (!value) return 'Item status is required';
+      break;
+    case 'item_type':
+      if (!value) return 'Item type is required';
+      break;
+    case 'reported_on':
+      if (!value) return 'Reported date is required';
+      break;
+    case 'reported_at':
+      if (!value) return 'Reported time is required';
+      break;
+    case 'latitude':
+    case 'longitude':
+      if (!value) return 'Coordinates are required';
+      break;
+    case 'item_pic':
+      if (!form.item_pic) return 'Item picture is required';
+      break;
+    default:
+      break;
+  }
+  return '';
+};
+
+const validateForm = () => {
+  form.errors.item_name = validateField('item_name', form.item_name);
+  form.errors.item_description = validateField('item_description', form.item_description);
+  form.errors.item_status = validateField('item_status', form.item_status);
+  form.errors.item_type = validateField('item_type', form.item_type);
+  form.errors.reported_on = validateField('reported_on', form.reported_on);
+  form.errors.reported_at = validateField('reported_at', form.reported_at);
+  form.errors.latitude = validateField('latitude', form.latitude);
+  form.errors.longitude = validateField('longitude', form.longitude);
+  form.errors.item_pic = validateField('item_pic', form.item_pic);
+
+  // Check if there are any errors
+  for (let key in form.errors) {
+    if (form.errors[key]) return false;
+  }
+  return true;
+};
+
 // Define the submit method to handle form submission
+// Update the submitForm method
 const submitForm = async () => {
-  added.value = true;
+  // Reset error message
+  errorMessage.value = '';
+
+  // Validate form
+  if (!validateForm()) {
+    errorMessage.value = 'Please fix the errors in the form';
+    return;
+  }
+
+  // Existing logic for file upload and form processing
+  hasLoaded.value = true;
   const fileName = Math.floor(Math.random() * 10000000000000000);
-  const {data, error} = await supabase.storage.from("images").upload("public/items/" + fileName, form.item_pic)
+  const { data, error } = await supabase.storage.from("images").upload("public/items/" + fileName, form.item_pic);
 
   if (error) {
     return errorMessage.value = "Cannot upload image";
@@ -134,23 +192,12 @@ const submitForm = async () => {
 
   form.processing = true;
 
-  console.log("Form: ", form);
-  console.log("User: ", user.value);
-
   if (!user.value) {
-    console.error('User is not loaded');
     errorMessage.value = 'You must be logged in to create an item';
     form.processing = false;
     return;
   }
 
-  if (!user.value.id) {
-    console.error('User ID is not available');
-    errorMessage.value = 'User ID is not available';
-    form.processing = false;
-    return;
-  }
-  
   const formattedDate = formatDate(form.reported_on);
   if (!formattedDate) {
     errorMessage.value = 'Invalid reported date';
@@ -172,11 +219,9 @@ const submitForm = async () => {
   };
 
   try {
-    console.log("X body: ", body)
     await addItem(body);
     router.push('/items');
   } catch (error) {
-    console.error('Error creating item:', error);
     await supabase.storage.from("images").remove([data.path]);
     alert('There was an error creating the item');
   } finally {
@@ -216,8 +261,8 @@ const updateCoordinates = ({ lng, lat }: { lng: number, lat: number }) => {
   flex: 1;
   display: block;
   position: relative;
-  width: 250px;
-  height: 350px;
+  width: 280px;
+  height: 285px;
   margin-bottom: 20px;
 }
 </style>

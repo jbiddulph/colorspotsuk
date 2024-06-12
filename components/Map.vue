@@ -11,7 +11,6 @@
 
 <script setup lang="ts">
 import mapboxgl from "mapbox-gl";
-import { ref, reactive, onMounted, onUnmounted, watch } from 'vue';
 
 const props = defineProps({
   width: {
@@ -71,7 +70,7 @@ const getUserLocation = () => {
 const mapContainerClasses = computed(() => {
   return [
     'map-container',
-    'w-[360px] mx-auto',
+    'w-[100%] mx-auto',
     'h-[400px]',
     'md:w-full',
     'md:h-100',
