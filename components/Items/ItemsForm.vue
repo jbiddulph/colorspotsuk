@@ -1,6 +1,14 @@
 <template>
 <div class="flex flex-col">
   <Head title="Register" />
+  <div v-if="added" class="bg-slate-500 bg-opacity-50 absolute top-0 left-0 w-screen h-screen flex items-center justify-center">
+    <svg class="animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 4.243 3.134 7.775 7.219 8.485l.781-3.194z"></path>
+    </svg>
+  </div>
+
+
   <h1 class="title text-center"><i><u>Lost</u></i> or<br /><i><u>Found</u></i> something?<br /> just <i><u>Report</u></i> it!</h1>
   <div class="w-full mx-auto bg-slate-100 p-3 rounded-lg">
     <form @submit.prevent="submitForm">
@@ -56,6 +64,7 @@ const router = useRouter();
 const user = useSupabaseUser();
 const supabase = useSupabaseClient();
 const errorMessage = ref("");
+const added = ref(false);
 // Define the form and its initial values
 const form = reactive({
   item_name: '',
@@ -115,6 +124,7 @@ const formatDate = (date: any) => {
 };
 // Define the submit method to handle form submission
 const submitForm = async () => {
+  added.value = true;
   const fileName = Math.floor(Math.random() * 10000000000000000);
   const {data, error} = await supabase.storage.from("images").upload("public/items/" + fileName, form.item_pic)
 
