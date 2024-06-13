@@ -173,19 +173,25 @@ const validateForm = () => {
   }
   return true;
 };
-
+import { useLocationStore } from "../../stores/location";
 const getCurrentLocation = () => {
+  
+  const locationStore = useLocationStore();
+
   if (navigator.geolocation) {
+    hasLoaded.value = true;
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
         console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+        locationStore.setLocation(latitude, longitude);
       },
       (error) => {
         console.error("Error getting location: ", error);
       }
     );
+    hasLoaded.value = false;
   } else {
     console.error("Geolocation is not supported by this browser.");
   }
