@@ -9,7 +9,7 @@
         <div class="flex flex-row justify-between w-full">
           <div class="flex items-center">
             <img src="/public/colorspots-logo.png" alt="Logo" class="w-10 h-10 mr-4" />
-            <h1 class="text-xl font-bold">ColorSpots.uk</h1>
+            <h1 class="text-xl font-bold">pinspots.co.uk</h1>
           </div>
           <button @click="toggleMenu" class="block md:hidden">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
