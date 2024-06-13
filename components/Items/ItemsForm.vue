@@ -32,10 +32,15 @@
           </select>
           <small class="text-red-700 mt-2">{{ form.errors.item_type }}</small>
         </div>
-        <TextInput name="Date" type="date" class="w-100" v-model="form.reported_on" :message="form.errors.reported_on" />
-        <TextInput name="Time" type="time" v-model="form.reported_at" :message="form.errors.reported_at" />
+        <div class="flex flex-row">
+          <TextInput name="Date" type="date" class="w-50 mr-2" v-model="form.reported_on" :message="form.errors.reported_on" />
+          <TextInput name="Time" type="time" v-model="form.reported_at" :message="form.errors.reported_at" />
+        </div>
         <div id="layout">
           <Map :height="350" :width="285" @update:coordinates="updateCoordinates" class="mt-4" />
+        </div>
+        <div class="flex w-100 justify-center mx-auto">
+          <div class="bg-green-500 text-white font-bold primary-btn mt-32 w-50 p-2 rounded mb-4 text-sm" @click="getCurrentLocation">Get current location</div>
         </div>
         <input type="hidden" v-model="form.latitude" />
         <input type="hidden" v-model="form.longitude" />
@@ -44,7 +49,7 @@
           {{ errorMessage }}
         </div>
         <div>
-          <button class="bg-green-500 text-white font-bold primary-btn mt-32 w-full p-4 rounded mb-4" :disabled="form.processing">Report it now</button>
+          <button class="bg-green-500 text-white font-bold primary-btn w-full p-4 rounded mb-4" :disabled="form.processing">Report it now</button>
         </div>
       </form>
     </div>
@@ -168,6 +173,23 @@ const validateForm = () => {
   }
   return true;
 };
+
+const getCurrentLocation = () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+      },
+      (error) => {
+        console.error("Error getting location: ", error);
+      }
+    );
+  } else {
+    console.error("Geolocation is not supported by this browser.");
+  }
+}
 
 // Define the submit method to handle form submission
 // Update the submitForm method
