@@ -36,10 +36,13 @@ const items = ref([]);
 const user = useSupabaseUser();
 const client = useSupabaseClient();
 const router = useRouter()
+onMounted(() => {
+  console.log("userID: ", user.value.id);
+});
 
 // GET ALL ITEMS
 const getItems = async () => {
-  return await $fetch('/api/items')
+  return await $fetch(`/api/items/user/${user.value.id}`)
 }
 
 items.value = await getItems();
