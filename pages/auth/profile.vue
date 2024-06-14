@@ -6,6 +6,7 @@
     <h2>Items</h2>
       <ul class="flex flex-row w-full flex-wrap gap-0 md:gap-6 justify-evenly">
         <li v-for="item in items" :key="item.id" class="bg-white m-4 md:m-0 border border-slate-300 rounded-lg md:w-[182px] w-full p-4 flex flex-col ">
+          <img :src="`${config.public.supabase.url}/storage/v1/object/public/images/${item.item_pic ? `/${item.item_pic}` : 'public/images/public/items/default.jpg'}`" alt="Avatar" class="m-0 pr-2 h-auto md:h-32">
         {{item.id}}
         {{item.item_name}}
         {{item.item_status}}
@@ -30,6 +31,7 @@ useHead({
 definePageMeta({
   middleware: ["auth"]
 })
+const config = useRuntimeConfig();
 const items = ref([]);
 const user = useSupabaseUser();
 const client = useSupabaseClient();
