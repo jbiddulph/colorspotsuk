@@ -24,11 +24,16 @@
                 {{ link.text }}
               </NuxtLink>
             </li>
+            <li v-if="user">
+              <button type="button" @click="logout" class="bg-red-800 rounded text-white px-6 py-2">
+                Logout
+              </button>
+            </li>
           </ul>
         </nav>
       </div>
     </header>
-    <main class="flex mx-auto">
+    <main class="flex mx-auto bg-slate-200">
       <nuxt-page />
     </main>
     <footer class="bg-gray-800 text-white text-center p-4">
@@ -42,12 +47,12 @@ const appStore = useAppStore();
 const { hasLoaded } = storeToRefs(appStore);
 
 import { useRoute } from 'vue-router';
-
+const client = useSupabaseClient();
 const user = useSupabaseUser();
 const isMenuOpen = ref(false);
 const route = useRoute();
 const links = ref([]);
-
+const router = useRouter()
 function toggleMenu() {
   isMenuOpen.value = !isMenuOpen.value;
 }
@@ -57,7 +62,15 @@ function closeMenuOnLinkClick() {
     isMenuOpen.value = false;
   }
 }
-
+const logout = async () => {
+  try {
+    const { error } = await client.auth.signOut()
+    if (error) throw error;
+    router.push("/auth/login");
+  } catch (error) {
+    console.log(error);
+  }
+}
 function isActive(path) {
   return route.path === path;
 }

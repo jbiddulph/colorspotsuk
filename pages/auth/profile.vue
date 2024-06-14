@@ -3,40 +3,23 @@
     <h1>Profile</h1>
     <p>{{user.id}}</p>
     <p>{{user.email}}</p>
-    <button type="button" @click="logout" class="bg-red-800 rounded text-white px-6 py-2">
-      Logout
-    </button>
-
-    <!-- form -->
-
-    <!-- end form -->
-
     <h2>Items</h2>
-    <table>
-      <thead>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Status</th>
-        <th>Type</th>
-        <th>Actions</th>
-      </thead>
-      <tbody>
-        <tr v-for="item in items" :key="item.id" class="border">
-          <td>{{item.id}}</td>
-          <td>{{item.item_name}}</td>
-          <td>{{item.item_status}}</td>
-          <td>{{item.item_type}}</td>
-          <td>
-            <button class="bg-amber-500 hover:bg-gray-400 text-gray-200 font-bold py-2 px-4 rounded inline-flex items-center mr-2">
-              <span>Edit</span>
-            </button>
-            <button class="bg-red-600 hover:bg-gray-400 text-gray-200 font-bold py-2 px-4 rounded inline-flex items-center mr-2">
-              <span>Delete</span>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <ul class="flex flex-row w-full flex-wrap gap-0 md:gap-6 justify-evenly">
+        <li v-for="item in items" :key="item.id" class="bg-white m-4 md:m-0 border border-slate-300 rounded-lg md:w-[182px] w-full p-4 flex flex-col ">
+        {{item.id}}
+        {{item.item_name}}
+        {{item.item_status}}
+        {{item.item_type}}
+        <div class="flex flex-row mr-2">
+          <button class="bg-amber-500 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2">
+            <span>Edit</span>
+          </button>
+          <button class="bg-red-600 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2">
+            <span>Delete</span>
+          </button>
+        </div>
+        </li>
+      </ul>
   </div>
 </template>
 
@@ -49,18 +32,8 @@ definePageMeta({
 })
 const items = ref([]);
 const user = useSupabaseUser();
-
 const client = useSupabaseClient();
 const router = useRouter()
-const logout = async () => {
-  try {
-    const { error } = await client.auth.signOut()
-    if (error) throw error;
-    router.push("/auth/login");
-  } catch (error) {
-    console.log(error);
-  }
-}
 
 // GET ALL ITEMS
 const getItems = async () => {
