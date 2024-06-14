@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <Head title="Register" />
     <h1 class="my-4 text-center text-2xl"><i><u><b>Lost</b></u></i> or<br /><i><u><b>Found</b></u></i> something?<br /> just <i><u><b>Report</b></u></i> it!</h1>
-    <div class="w-full mx-auto bg-slate-100 p-3 rounded-lg">
+    <div class="w-full mx-auto bg-white border mb-12 p-3 rounded-lg">
       <form @submit.prevent="submitForm">
         <div class="grid place-items-center">
           <div class="relative w-28 h-28 rounded-full overflow-hidden border border-slate-300">
@@ -14,7 +14,7 @@
           </div>
           <small class="text-red-700 mt-2">{{ form.errors.item_pic }}</small>
         </div>
-        <TextInput name="Name" v-model="form.item_name" :message="form.errors.item_name" />
+        <TextInput name="Title" v-model="form.item_name" :message="form.errors.item_name" />
         <TextInput name="Description" v-model="form.item_description" :message="form.errors.item_description" />
         <!-- Status dropdown -->
         <div class="mb-6">

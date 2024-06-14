@@ -146,7 +146,9 @@ onMounted(() => {
 
 watch([() => locationStore.latitude, () => locationStore.longitude], ([latitude, longitude]) => {
   console.log("xxlatitude: ", latitude);
+  map.value.setCenter([longitude, latitude]);
   if (latitude !== null && longitude !== null && map.value) {
+    console.log("Latty: ", latitude);
     map.value.setCenter([longitude, latitude]);
   }
 });
