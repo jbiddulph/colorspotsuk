@@ -23,9 +23,6 @@
 
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -46,7 +43,6 @@ export default defineEventHandler(async (event) => {
   if (!existingItem) {
     return createError({ statusCode: 404, statusMessage: "Item not found" });
   }
-
   // Delete the item from the database
   await prisma.items.delete({
     where: {
@@ -60,16 +56,6 @@ export default defineEventHandler(async (event) => {
 
   if (error) return createError({ statusCode: 500, statusMessage: "Server Error" });
 
-  // Delete the image from Supabase storage if it exists
-  if (existingItem.item_pic) {
-    const imagePath = `public/items/${existingItem.item_pic}`;
-    const { error: storageError } = await supabase.storage.from('images').remove([imagePath]);
-
-    if (storageError) {
-      console.error('Error removing image from storage:', storageError);
-      return createError({ statusCode: 500, statusMessage: "Error deleting image from storage" });
-    }
-  }
 
   return item;
 });

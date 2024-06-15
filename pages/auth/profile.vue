@@ -15,7 +15,7 @@
           <NuxtLink :href="`/items/update?id=${item.id}&user_id=${item.user_id}`" class="bg-amber-500 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2">
             <span>Edit</span>
           </NuxtLink>
-          <button @click="deleteItem(item.id)" class="bg-red-600 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2">
+          <button @click="deleteItem(item.id, item.item_pic)" class="bg-red-600 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2">
             <span>Delete</span>
           </button>
         </div>
@@ -32,6 +32,7 @@ definePageMeta({
   middleware: ["auth"]
 })
 const config = useRuntimeConfig();
+const supabase = useSupabaseClient();
 const items = ref([]);
 const user = useSupabaseUser();
 const client = useSupabaseClient();
@@ -53,9 +54,16 @@ const fetchItems = async () => {
 
 items.value = await getItems();
 console.log("items", items);
-const deleteItem = async (id: string) => {
+const deleteItem = async (id: string, image: string) => {
   if (confirm("Are you sure you want to delete this item?")) {
     try {
+      const imagePath = `${image}`;
+      console.log("ImagePath: ", imagePath);
+      const { error: storageError } = await supabase.storage.from('images').remove([imagePath]);
+      if (storageError) {
+        console.error('Error removing image from storage:', storageError);
+        return createError({ statusCode: 500, statusMessage: "Error deleting image from storage" });
+      }
       await $fetch(`/api/items`, {
         method: 'DELETE',
         body: { id }
