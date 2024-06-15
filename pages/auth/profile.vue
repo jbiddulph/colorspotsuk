@@ -15,7 +15,7 @@
           <NuxtLink :href="`/items/update?id=${item.id}&user_id=${item.user_id}`" class="bg-amber-500 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2">
             <span>Edit</span>
           </NuxtLink>
-          <button class="bg-red-600 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2">
+          <button @click="deleteItem(item.id)" class="bg-red-600 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2">
             <span>Delete</span>
           </button>
         </div>
@@ -42,11 +42,32 @@ onMounted(() => {
 
 // GET ALL ITEMS
 const getItems = async () => {
-  return await $fetch(`/api/items/user/${user.value.id}`)
-}
+  return await $fetch(`/api/items/user/${user.value.id}`);
+};
+
+const fetchItems = async () => {
+  items.value = await getItems();
+  console.log("items", items);
+};
+
 
 items.value = await getItems();
 console.log("items", items);
+const deleteItem = async (id: string) => {
+  if (confirm("Are you sure you want to delete this item?")) {
+    try {
+      await $fetch(`/api/items`, {
+        method: 'DELETE',
+        body: { id }
+      });
+      // Refresh the item list after deletion
+      await fetchItems();
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
+  }
+};
+
 </script>
 
 <style scoped>

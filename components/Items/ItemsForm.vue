@@ -336,7 +336,7 @@ const submitForm = async () => {
       await addItem(body);
     }
     hasLoaded.value = false;
-    router.push('/items');
+    router.push('/auth/profile');
   } catch (error) {
     if (form.item_pic && form.item_pic instanceof File && imagePath !== 'public/items/default.jpg') {
       await supabase.storage.from("images").remove([imagePath]);
