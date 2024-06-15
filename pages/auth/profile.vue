@@ -12,9 +12,9 @@
         {{item.item_status}}
         {{item.item_type}}
         <div class="flex flex-row mr-2">
-          <button class="bg-amber-500 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2">
+          <NuxtLink :href="`/items/update?id=${item.id}&user_id=${item.user_id}`" class="bg-amber-500 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2">
             <span>Edit</span>
-          </button>
+          </NuxtLink>
           <button class="bg-red-600 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2">
             <span>Delete</span>
           </button>

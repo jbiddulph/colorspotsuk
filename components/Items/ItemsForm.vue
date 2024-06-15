@@ -2,6 +2,7 @@
   <div class="flex flex-col">
     <Head title="Register" />
     <h1 class="my-4 text-center text-2xl"><i><u><b>Lost</b></u></i> or<br /><i><u><b>Found</b></u></i> something?<br /> just <i><u><b>Report</b></u></i> it!</h1>
+    <div>{{ props.isEditMode }}</div>
     <div class="w-full mx-auto bg-white border mb-12 p-3 rounded-lg">
       <form @submit.prevent="submitForm">
         <div class="grid place-items-center">
@@ -10,7 +11,7 @@
               <span class="bg-white/70 pb-2 text-center">Item Pic</span>
             </label>
             <input type="file" @change="changePic" id="item_pic" hidden>
-            <img class="object-cover w-28 h-28" :src="form.preview ?? `${config.public.supabase.url}/storage/v1/object/public/images/public/items/default.jpg`" />
+            <img class="object-cover w-28 h-28" :src="form.preview ?? defaultImageUrl" />
           </div>
           <small class="text-red-700 mt-2">{{ form.errors.item_pic }}</small>
         </div>
@@ -49,22 +50,31 @@
           {{ errorMessage }}
         </div>
         <div>
-          <button class="bg-green-500 text-white font-bold primary-btn w-full p-4 rounded mb-4" :disabled="form.processing">Report it now</button>
+          <button v-if="props.isEditMode" class="bg-orange-500 text-white font-bold primary-btn w-full p-4 rounded mb-4" :disabled="form.processing">Update Item</button>
+          <button v-else class="bg-green-500 text-white font-bold primary-btn w-full p-4 rounded mb-4" :disabled="form.processing">Report it now</button>
         </div>
       </form>
     </div>
   </div>
 </template>
 
-
 <script setup lang="ts">
-
+import { useLocationStore } from "../../stores/location";
+const locationStore = useLocationStore();
 const appStore = useAppStore();
 const router = useRouter();
+const route = useRoute();
 const user = useSupabaseUser();
 const supabase = useSupabaseClient();
 const errorMessage = ref("");
 const { hasLoaded } = storeToRefs(appStore)
+const config = useRuntimeConfig();
+const props = defineProps({
+  isEditMode: {
+    type: Boolean,
+    default: false
+  }
+})
 // Define the form and its initial values
 const form = reactive({
   item_name: '',
@@ -75,7 +85,7 @@ const form = reactive({
   longitude: null,
   reported_on: '',
   reported_at: '',
-  item_pic: null,
+  item_pic: null as string | null, // Make item_pic nullable
   preview: '',
   errors: {
     item_name: '',
@@ -90,20 +100,74 @@ const form = reactive({
   },
   processing: false
 });
+const item = ref(null);
+const itemId = route.query.id;
+const userId = route.query.user_id;
+console.log("itemId: ", itemId);
+console.log("userId: ", userId);
+console.log("user_id: ", user?.value?.id)
+
 const statuses = ['Lost', 'Found', 'Report'];
 const typesMap = {
   Lost: ['Electronics', 'Clothing', 'Jewelry', 'Other'],
   Found: ['Electronics', 'Clothing', 'Jewelry', 'Other'],
   Report: ['Incident', 'Complaint', 'Suggestion', 'Pothole', 'Sinkhole', 'Trip Hazard', 'Crime', 'Theft', 'Disturbance', 'Danger', 'Crash', 'Dog Poop', 'UFO']
 };
+const defaultImageUrl = `${config.public.supabase.url}/storage/v1/object/public/images/public/items/default.jpg`;
+const fetchItem = async () => {
+  if (!itemId) return;
+
+  try {
+    item.value = await $fetch(`/api/items/${itemId}`);
+    if (item.value) {
+      form.item_name = item.value.item_name;
+      form.item_description = item.value.item_description;
+      form.item_status = item.value.item_status;
+      form.item_type = item.value.item_type;
+      form.latitude = item.value.latitude;
+      form.longitude = item.value.longitude;
+      form.reported_on = item.value.reported_on;
+      form.reported_at = item.value.reported_at;
+
+      if (item.value.item_pic) {
+        form.item_pic = `${config.public.supabase.url}/storage/v1/object/public/images/${item.value.item_pic}`; 
+        form.preview = `${config.public.supabase.url}/storage/v1/object/public/images/${item.value.item_pic}`;
+      } else {
+        form.preview = defaultImageUrl;
+      }
+      const latitude = item.value.latitude;
+      const longitude = item.value.longitude;
+      locationStore.setLocation(latitude, longitude);
+    }
+  } catch (error) {
+    console.error('Error fetching item:', error);
+  }
+};
+
+
+// Watch for changes to itemId to re-fetch item data
+watch(() => route.params.id, fetchItem, { immediate: true });
+onMounted(() => {
+  // if(userId !== user?.value?.id) {
+  //   router.push('/auth/profile');
+  // }
+})
 // Define the changePic method to handle file input change
 const changePic = (e: Event) => {
   const input = e.target as HTMLInputElement;
   if (input.files && input.files[0]) {
     form.item_pic = input.files[0];
     form.preview = URL.createObjectURL(input.files[0]);
+  } else if (props.isEditMode && item.value?.item_pic) {
+    // Ensure preview remains linked to the original image path if no new file is selected in edit mode
+    form.preview = `${config.public.supabase.url}/storage/v1/object/public/images/${item.value.item_pic}`;
+  } else {
+    form.preview = defaultImageUrl;
   }
 };
+
+// const defaultImageUrl = `${config.public.supabase.url}/storage/v1/object/public/images/public/items/default.jpg`;
+
 // Format date
 const formatDate = (date: any) => {
   const d = new Date(date);
@@ -173,10 +237,8 @@ const validateForm = () => {
   }
   return true;
 };
-import { useLocationStore } from "../../stores/location";
+
 const getCurrentLocation = () => {
-  
-  const locationStore = useLocationStore();
 
   if (navigator.geolocation) {
     hasLoaded.value = true;
@@ -209,15 +271,24 @@ const submitForm = async () => {
     return;
   }
   hasLoaded.value = true;
-  // Existing logic for file upload and form processing
-  const fileName = Math.floor(Math.random() * 10000000000000000);
-  const { data, error } = await supabase.storage.from("images").upload("public/items/" + fileName, form.item_pic);
-
-  if (error) {
-    return errorMessage.value = "Cannot upload image";
-  }
 
   form.processing = true;
+
+  let imagePath = item.value?.item_pic ?? 'public/items/default.jpg';
+
+  if (form.item_pic && form.item_pic instanceof File) {
+    const fileName = Math.floor(Math.random() * 10000000000000000);
+    const { data, error } = await supabase.storage
+      .from("images")
+      .upload("public/items/" + fileName, form.item_pic);
+
+    if (error) {
+      errorMessage.value = "Cannot upload image";
+      form.processing = false;
+      return;
+    }
+    imagePath = data.path;
+  }
 
   if (!user.value) {
     errorMessage.value = 'You must be logged in to create an item';
@@ -241,17 +312,36 @@ const submitForm = async () => {
     longitude: parseFloat(form.longitude),
     reported_on: formattedDate,
     reported_at: form.reported_at,
-    item_pic: data.path,
+    item_pic: imagePath,
     user_id: user.value.id
   };
 
+  const updatedItem = {
+    id: itemId,
+    item_name: form.item_name,
+    item_description: form.item_description,
+    item_status: form.item_status,
+    item_type: form.item_type,
+    latitude: parseFloat(form.latitude),
+    longitude: parseFloat(form.longitude),
+    reported_on: formattedDate,
+    reported_at: form.reported_at,
+    item_pic: imagePath,
+    user_id: user.value.id
+  };
   try {
-    await addItem(body);
+    if (props.isEditMode) {
+      await updateItem({ ...body, id: itemId });
+    } else {
+      await addItem(body);
+    }
     hasLoaded.value = false;
     router.push('/items');
   } catch (error) {
-    await supabase.storage.from("images").remove([data.path]);
-    alert('There was an error creating the item');
+    if (form.item_pic && form.item_pic instanceof File && imagePath !== 'public/items/default.jpg') {
+      await supabase.storage.from("images").remove([imagePath]);
+    }
+    errorMessage.value = 'There was an error creating/updating the item';
   } finally {
     form.processing = false;
   }
@@ -276,13 +366,28 @@ const addItem = async (item: any) => {
   }
 };
 
+// UPDATE ITEM
+const updateItem = async (updatedItem: any) => {
+  try {
+    const response = await $fetch(`/api/items`, {
+      method: "PUT",
+      body: updatedItem
+    });
+
+    // Optionally, handle response here if needed
+    console.log("Item updated successfully:", response);
+
+  } catch (error) {
+    console.error('Error updating item:', error);
+    throw new Error('Failed to update item');
+  }
+};
 // Update the form's latitude and longitude when the map coordinates change
 const updateCoordinates = ({ lng, lat }: { lng: number, lat: number }) => {
   form.latitude = lat;
   form.longitude = lng;
 };
 </script>
-
 
 <style scoped>
 #layout {
