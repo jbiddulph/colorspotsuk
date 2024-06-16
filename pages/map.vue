@@ -33,9 +33,9 @@ import '../node_modules/mapbox-gl/dist/mapbox-gl.css';
 useHead({
   title: "Map Items page"
 })
-definePageMeta({
-  middleware: ["auth"]
-})
+// definePageMeta({
+//   middleware: ["auth"]
+// })
 const items = ref([]);
 const filterOptions = [
   { id: 'option1', value: '', selectedColor: '#ff9900', defaultColor: '#ffc281' },

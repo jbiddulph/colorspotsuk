@@ -2,7 +2,6 @@
   <div class="flex flex-col">
     <Head title="Register" />
     <h1 class="my-4 text-center text-2xl"><i><u><b>Lost</b></u></i> or<br /><i><u><b>Found</b></u></i> something?<br /> just <i><u><b>Report</b></u></i> it!</h1>
-    <div>{{ props.isEditMode }}</div>
     <div class="w-full mx-auto bg-white border mb-12 p-3 rounded-lg">
       <form @submit.prevent="submitForm">
         <div class="grid place-items-center">
@@ -11,7 +10,7 @@
               <span class="bg-white/70 pb-2 text-center">Item Pic</span>
             </label>
             <input type="file" @change="changePic" id="item_pic" hidden>
-            <img class="object-cover w-28 h-28" :src="form.preview ?? defaultImageUrl" />
+            <img class="object-cover w-28 h-28" :src="imageUrl" />
           </div>
           <small class="text-red-700 mt-2">{{ form.errors.item_pic }}</small>
         </div>
@@ -59,6 +58,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, reactive, computed, watch, onMounted } from 'vue';
 import { useLocationStore } from "../../stores/location";
 const locationStore = useLocationStore();
 const appStore = useAppStore();
@@ -75,6 +75,7 @@ const props = defineProps({
     default: false
   }
 })
+
 // Define the form and its initial values
 const form = reactive({
   item_name: '',
@@ -100,12 +101,10 @@ const form = reactive({
   },
   processing: false
 });
+
 const item = ref(null);
 const itemId = route.query.id;
 const userId = route.query.user_id;
-console.log("itemId: ", itemId);
-console.log("userId: ", userId);
-console.log("user_id: ", user?.value?.id)
 
 const statuses = ['Lost', 'Found', 'Report'];
 const typesMap = {
@@ -114,6 +113,7 @@ const typesMap = {
   Report: ['Incident', 'Complaint', 'Suggestion', 'Pothole', 'Sinkhole', 'Trip Hazard', 'Crime', 'Theft', 'Disturbance', 'Danger', 'Crash', 'Dog Poop', 'UFO']
 };
 const defaultImageUrl = `${config.public.supabase.url}/storage/v1/object/public/images/public/items/default.jpg`;
+
 const fetchItem = async () => {
   if (!itemId) return;
 
@@ -144,14 +144,18 @@ const fetchItem = async () => {
   }
 };
 
-
 // Watch for changes to itemId to re-fetch item data
 watch(() => route.params.id, fetchItem, { immediate: true });
+
 onMounted(() => {
-  // if(userId !== user?.value?.id) {
-  //   router.push('/auth/profile');
-  // }
-})
+  fetchItem();
+});
+
+// Computed property to get the image URL
+const imageUrl = computed(() => {
+  return form.preview || defaultImageUrl;
+});
+
 // Define the changePic method to handle file input change
 const changePic = (e: Event) => {
   const input = e.target as HTMLInputElement;
@@ -165,8 +169,6 @@ const changePic = (e: Event) => {
     form.preview = defaultImageUrl;
   }
 };
-
-// const defaultImageUrl = `${config.public.supabase.url}/storage/v1/object/public/images/public/items/default.jpg`;
 
 // Format date
 const formatDate = (date: any) => {
@@ -186,6 +188,7 @@ const formatDate = (date: any) => {
 
   return [year, month, day].join('-');
 };
+
 // Add validation functions to your script setup
 const validateField = (field: string, value: any) => {
   switch (field) {
@@ -239,7 +242,6 @@ const validateForm = () => {
 };
 
 const getCurrentLocation = () => {
-
   if (navigator.geolocation) {
     hasLoaded.value = true;
     navigator.geolocation.getCurrentPosition(
@@ -260,7 +262,6 @@ const getCurrentLocation = () => {
 }
 
 // Define the submit method to handle form submission
-// Update the submitForm method
 const submitForm = async () => {
   // Reset error message
   errorMessage.value = '';
@@ -329,6 +330,7 @@ const submitForm = async () => {
     item_pic: imagePath,
     user_id: user.value.id
   };
+
   try {
     if (props.isEditMode) {
       await updateItem({ ...body, id: itemId });
@@ -382,6 +384,7 @@ const updateItem = async (updatedItem: any) => {
     throw new Error('Failed to update item');
   }
 };
+
 // Update the form's latitude and longitude when the map coordinates change
 const updateCoordinates = ({ lng, lat }: { lng: number, lat: number }) => {
   form.latitude = lat;

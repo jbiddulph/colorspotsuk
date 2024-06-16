@@ -78,14 +78,15 @@ function isActive(path) {
 watchEffect(() => {
   if (user.value) {
     links.value = [
-      { text: 'Home', href: '/' },
+      // { text: 'Home', href: '/' },
       { text: 'Map', href: '/map' },
-      { text: 'Profile', href: '/auth/profile' },
+      { text: 'Items', href: '/auth/profile' },
       { text: 'Add Item', href: '/items/create' },
     ];
   } else {
     links.value = [
-      { text: 'Home', href: '/' },
+      // { text: 'Home', href: '/' },
+      { text: 'Map', href: '/map' },
       { text: 'Login', href: '/auth/login' },
       { text: 'Register', href: '/auth/register' },
     ];
