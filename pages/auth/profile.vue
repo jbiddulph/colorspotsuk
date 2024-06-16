@@ -1,17 +1,17 @@
 <template>
   <div class="container mx-auto">
-    <h1>Profile</h1>
+    <h1 class="text-4xl py-10 px-4">My Items</h1>
     <!-- <p>{{user.id}}</p>
     <p>{{user.email}}</p> -->
-    <h2>Items</h2>
-    <div class="flex mx-auto w-100">
-      <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
-      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+    <!-- <h2>Items</h2> -->
+    <div v-if="totalPages.value > 1" class="flex mx-auto w-100 justify-center mb-10">
+      <button class="bg-green-500 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2" @click="prevPage" :disabled="currentPage === 1">Prev</button>
+      <button class="bg-green-500 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2" @click="nextPage" :disabled="currentPage === totalPages">Next</button>
     </div>
     <ul class="flex flex-row w-full flex-wrap gap-0 md:gap-6 justify-evenly">
       <li v-for="item in items" :key="item.id" class="bg-white m-4 md:m-0 border border-slate-300 rounded-lg md:w-[182px] w-full p-4 flex flex-col">
         <img :src="`${config.public.supabase.url}/storage/v1/object/public/images/${item.item_pic ? item.item_pic : 'public/images/public/items/default.jpg'}`" alt="Avatar" class="m-0 pr-2 h-auto md:h-32">
-        {{item.id}}
+        <!-- {{item.id}} -->
         {{item.item_name}}
         {{item.item_status}}
         {{item.item_type}}
@@ -25,6 +25,10 @@
         </div>
       </li>
     </ul>
+    <div v-if="totalPages.value > 1" class="flex mx-auto w-100 justify-center mt-10">
+      <button class="bg-green-500 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2" @click="prevPage" :disabled="currentPage === 1">Prev</button>
+      <button class="bg-green-500 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2" @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+    </div>
   </div>
 </template>
 
@@ -44,9 +48,9 @@ const router = useRouter();
 const totalItems = ref(0);
 const totalPages = ref(1);
 const currentPage = ref(1);
-const limit = ref(10);
+const limit = ref(30);
 
-const getItems = async (page = 1, limit = 10) => {
+const getItems = async (page = 1, limit = 30) => {
   const response = await $fetch(`/api/items/user/${user.value.id}`, {
     params: {
       page,
