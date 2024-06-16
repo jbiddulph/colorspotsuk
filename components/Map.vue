@@ -1,39 +1,38 @@
 <template>
   <div>
     <div v-if="showSidebar" id="sidebar">Lng: {{ location.lng }} | Lat: {{ location.lat }} | Z: {{ location.zoom }}</div>
-    <!-- <div ref="mapContainer" :style="{ height: `${props.height}px`, width: `${props.width}px` }" class="map-container"> -->
-      <div ref="mapContainer" :class="mapContainerClasses">
-      <!-- Add crosshair element -->
+    <div ref="mapContainer" :class="mapContainerClasses">
       <div class="crosshair"></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import mapboxgl from "mapbox-gl";
-import { ref, reactive, onMounted, onUnmounted, watch } from 'vue';
+import { ref, reactive, computed, onMounted, watch } from 'vue';
+import mapboxgl from 'mapbox-gl';
+import { useLocationStore } from "../stores/location";
 
 const props = defineProps({
   width: {
     type: Number,
-    required: true
+    required: true,
   },
   height: {
     type: Number,
-    required: true
+    required: true,
   },
   data: {
     type: Array,
-    default: () => []
+    default: () => [],
   },
   filter: {
     type: String,
-    default: ''
+    default: '',
   },
   showSidebar: {
     type: Boolean,
-    default: true
-  }
+    default: true,
+  },
 });
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiamJpZGR1bHBoIiwiYSI6ImNscDgzemt0ZzJjNW8ydnM0MXJvNG56NjEifQ.h0CNNEv-Yjgkp4WMjOK9mA';
@@ -43,54 +42,37 @@ const mapContainer = ref<HTMLDivElement | null>(null);
 const location = reactive({
   lng: -0.392432,
   lat: 50.819092,
-  zoom: 16
+  zoom: 16,
 });
 
 const emit = defineEmits(['update:coordinates']);
 let markers = [];
 
-const getUserLocation = () => {
-  return new Promise<{ longitude: number; latitude: number }>((resolve, reject) => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          resolve({
-            longitude: position.coords.longitude,
-            latitude: position.coords.latitude
-          });
-        },
-        error => {
-          reject(error);
-        }
-      );
-    } else {
-      reject(new Error('Geolocation is not supported by this browser.'));
-    }
-  });
-};
+const locationStore = useLocationStore();
+
 const mapContainerClasses = computed(() => {
   return [
     'map-container',
-    'w-[360px] mx-auto',
+    'w-[100%] mx-auto',
     'h-[400px]',
     'md:w-full',
     'md:h-100',
-    // `md:w-[${props.width}px]`,
-    // `md:h-[${props.height}px]`
   ].join(' ');
 });
+
 const createMarkerElement = (color: string) => {
-  console.log("Creating marker element with color:", color); // Debug log
   const markerElement = document.createElement('div');
   markerElement.style.width = '30px';
   markerElement.style.height = '30px';
   markerElement.style.backgroundColor = color;
   markerElement.style.borderRadius = '50%';
   markerElement.style.border = '2px solid white';
-  markerElement.style.zIndex = '100'; // Ensure this is high enough
+  markerElement.style.zIndex = '100';
   return markerElement;
 };
+
 const config = useRuntimeConfig();
+
 const addMarkers = () => {
   if (map.value) {
     markers.forEach(marker => marker.remove());
@@ -99,11 +81,13 @@ const addMarkers = () => {
     props.data.forEach(item => {
       if (props.filter && item.item_status !== props.filter) return;
 
-      let markerColor = '#2fc5e0';
+      let markerColor = '#ff9900';
       if (item.item_status === 'Lost') {
-        markerColor = '#ff0066';
+        markerColor = '#e40000';
       } else if (item.item_status === 'Found') {
-        markerColor = 'green';
+        markerColor = '#33cc33';
+      } else if (item.item_status === 'Report') {
+        markerColor = '#2fc5e0';
       }
 
       const markerElement = createMarkerElement(markerColor);
@@ -130,48 +114,42 @@ const addMarkers = () => {
   }
 };
 
-onMounted(async () => {
-  try {
-    if (mapContainer.value) {
-      map.value = new mapboxgl.Map({
-        container: mapContainer.value,
-        style: 'mapbox://styles/mapbox/streets-v12',
-        center: [location.lng, location.lat],
-        zoom: location.zoom
+onMounted(() => {
+  if (mapContainer.value) {
+    map.value = new mapboxgl.Map({
+      container: mapContainer.value,
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [location.lng, location.lat],
+      zoom: location.zoom,
+    });
+
+    map.value.on('move', () => {
+      const { lng, lat } = map.value.getCenter();
+      const zoom = map.value.getZoom();
+      location.lng = lng.toFixed(6);
+      location.lat = lat.toFixed(6);
+      location.zoom = zoom.toFixed(2);
+
+      emit('update:coordinates', {
+        lng: location.lng,
+        lat: location.lat,
       });
+    });
 
-      map.value.on('move', () => {
-        const { lng, lat } = map.value.getCenter();
-        const zoom = map.value.getZoom();
-        location.lng = lng.toFixed(6);
-        location.lat = lat.toFixed(6);
-        location.zoom = zoom.toFixed(2);
+    map.value.on('load', addMarkers);
 
-        emit('update:coordinates', {
-          lng: location.lng,
-          lat: location.lat,
-        });
-      });
+    const crosshair = document.createElement('div');
+    crosshair.className = 'crosshair';
+    mapContainer.value.appendChild(crosshair);
+  }
+});
 
-      const crosshair = document.createElement('div');
-      crosshair.className = 'crosshair';
-      mapContainer.value.appendChild(crosshair);
-
-      try {
-        const userLocation = await getUserLocation();
-        location.lng = userLocation.longitude;
-        location.lat = userLocation.latitude;
-        map.value.setCenter([location.lng, location.lat]);
-      } catch (error) {
-        console.error('Error getting user location:', error);
-        alert('Geolocation permission denied. Using default location.');
-        map.value.setCenter([location.lng, location.lat]);
-      }
-
-      addMarkers();
-    }
-  } catch (error) {
-    console.error('Error initializing map:', error);
+watch([() => locationStore.latitude, () => locationStore.longitude], ([latitude, longitude]) => {
+  console.log("xxlatitude: ", latitude);
+  map.value.setCenter([longitude, latitude]);
+  if (latitude !== null && longitude !== null && map.value) {
+    console.log("Latty: ", latitude);
+    map.value.setCenter([longitude, latitude]);
   }
 });
 

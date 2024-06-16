@@ -17,7 +17,7 @@ model Items {
   id              Int      @id @default(autoincrement())
   item_name       String
   item_description String
-  item_pic        String
+  item_pic        String?
   item_status     String
   item_type       String
   latitude        Float

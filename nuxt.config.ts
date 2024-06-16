@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ["@nuxtjs/tailwindcss", "@nuxtjs/supabase"],
+  modules: ["@nuxtjs/tailwindcss", "@nuxtjs/supabase", "@pinia/nuxt"],
   runtimeConfig: {
     public: {
       supabaseUrl: process.env.SUPABASE_URL,
@@ -10,5 +10,14 @@ export default defineNuxtConfig({
   },
   supabase: {
     redirect: false,
+  },
+  imports: {
+    dirs: ['stores']
+  },
+  app: {
+    head: {
+      charset: 'utf-8',
+      viewport: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
+    }
   }
 })
