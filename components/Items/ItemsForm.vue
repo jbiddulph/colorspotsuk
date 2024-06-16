@@ -41,7 +41,7 @@
           <Map :height="350" :width="285" @update:coordinates="updateCoordinates" class="mt-4" />
         </div>
         <div class="flex w-100 justify-center mx-auto">
-          <div class="bg-green-500 text-white font-bold primary-btn mt-32 w-50 p-2 rounded mb-4 text-sm" @click="getCurrentLocation">Get current location</div>
+          <div class="bg-green-500 text-white font-bold primary-btn mt-32 w-50 p-2 rounded mb-4 text-sm cursor-pointer" @click="getCurrentLocation">Get current location</div>
         </div>
         <input type="hidden" v-model="form.latitude" />
         <input type="hidden" v-model="form.longitude" />

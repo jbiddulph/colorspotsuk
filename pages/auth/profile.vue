@@ -1,12 +1,16 @@
 <template>
   <div class="container mx-auto">
     <h1>Profile</h1>
-    <p>{{user.id}}</p>
-    <p>{{user.email}}</p>
+    <!-- <p>{{user.id}}</p>
+    <p>{{user.email}}</p> -->
     <h2>Items</h2>
-      <ul class="flex flex-row w-full flex-wrap gap-0 md:gap-6 justify-evenly">
-        <li v-for="item in items" :key="item.id" class="bg-white m-4 md:m-0 border border-slate-300 rounded-lg md:w-[182px] w-full p-4 flex flex-col ">
-          <img :src="`${config.public.supabase.url}/storage/v1/object/public/images/${item.item_pic ? `/${item.item_pic}` : 'public/images/public/items/default.jpg'}`" alt="Avatar" class="m-0 pr-2 h-auto md:h-32">
+    <div class="flex mx-auto w-100">
+      <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
+      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+    </div>
+    <ul class="flex flex-row w-full flex-wrap gap-0 md:gap-6 justify-evenly">
+      <li v-for="item in items" :key="item.id" class="bg-white m-4 md:m-0 border border-slate-300 rounded-lg md:w-[182px] w-full p-4 flex flex-col">
+        <img :src="`${config.public.supabase.url}/storage/v1/object/public/images/${item.item_pic ? item.item_pic : 'public/images/public/items/default.jpg'}`" alt="Avatar" class="m-0 pr-2 h-auto md:h-32">
         {{item.id}}
         {{item.item_name}}
         {{item.item_status}}
@@ -19,8 +23,8 @@
             <span>Delete</span>
           </button>
         </div>
-        </li>
-      </ul>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -32,34 +36,62 @@ definePageMeta({
   middleware: ["auth"]
 })
 const config = useRuntimeConfig();
-const supabase = useSupabaseClient();
 const items = ref([]);
 const user = useSupabaseUser();
 const client = useSupabaseClient();
-const router = useRouter()
+const router = useRouter();
+
+const totalItems = ref(0);
+const totalPages = ref(1);
+const currentPage = ref(1);
+const limit = ref(10);
+
+const getItems = async (page = 1, limit = 10) => {
+  const response = await $fetch(`/api/items/user/${user.value.id}`, {
+    params: {
+      page,
+      limit,
+    },
+  });
+
+  return response;
+};
+
+const fetchItems = async (page = 1) => {
+  const { items: fetchedItems, totalItems: fetchedTotalItems, totalPages: fetchedTotalPages, currentPage: fetchedCurrentPage } = await getItems(page, limit.value);
+  items.value = fetchedItems;
+  totalItems.value = fetchedTotalItems;
+  totalPages.value = fetchedTotalPages;
+  currentPage.value = fetchedCurrentPage;
+  console.log("items: ", items.value);
+  console.log("total Items: ", totalItems.value);
+  console.log("total Pages: ", totalPages.value);
+  console.log("current page: ", currentPage.value);
+};
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    fetchItems(currentPage.value + 1);
+  }
+};
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    fetchItems(currentPage.value - 1);
+  }
+};
+
 onMounted(() => {
+  fetchItems(currentPage.value);
   console.log("userID: ", user.value.id);
 });
 
-// GET ALL ITEMS
-const getItems = async () => {
-  return await $fetch(`/api/items/user/${user.value.id}`);
-};
-
-const fetchItems = async () => {
-  items.value = await getItems();
-  console.log("items", items);
-};
-
-
-items.value = await getItems();
-console.log("items", items);
 const deleteItem = async (id: string, image: string) => {
   if (confirm("Are you sure you want to delete this item?")) {
     try {
       const imagePath = `${image}`;
       console.log("ImagePath: ", imagePath);
-      const { error: storageError } = await supabase.storage.from('images').remove([imagePath]);
+      const { error: storageError } = await client.storage.from('images').remove([imagePath]);
       if (storageError) {
         console.error('Error removing image from storage:', storageError);
         return createError({ statusCode: 500, statusMessage: "Error deleting image from storage" });
@@ -69,13 +101,12 @@ const deleteItem = async (id: string, image: string) => {
         body: { id }
       });
       // Refresh the item list after deletion
-      await fetchItems();
+      await fetchItems(currentPage.value);
     } catch (error) {
       console.error("Error deleting item:", error);
     }
   }
 };
-
 </script>
 
 <style scoped>

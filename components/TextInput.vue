@@ -1,7 +1,7 @@
 <template>
   <div class="mb-6 flex flex-col">
     <label>{{ name }}</label>
-    {{ max }}
+    <!-- {{ max }} -->
     <input :type="type" v-model="model" :class="{'!ring-red-600' : message}" class="w-100 p-2 border rounded ">
     <small class="text-red-700 mt-2" v-if="message">{{ message }}</small>
   </div>
