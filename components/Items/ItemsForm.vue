@@ -108,9 +108,9 @@ const userId = route.query.user_id;
 
 const statuses = ['Lost', 'Found', 'Report'];
 const typesMap = {
-  Lost: ['Electronics', 'Clothing', 'Jewelry', 'Other'],
-  Found: ['Electronics', 'Clothing', 'Jewelry', 'Other'],
-  Report: ['Incident', 'Complaint', 'Suggestion', 'Pothole', 'Sinkhole', 'Trip Hazard', 'Crime', 'Theft', 'Disturbance', 'Danger', 'Crash', 'Dog Poop', 'UFO']
+  Lost: ['Location', 'Information', 'Electronics', 'Clothing', 'Jewelry', 'Other'],
+  Found: ['Information', 'Attractive', 'Interesting', 'Electronics', 'Clothing', 'Jewelry', 'Other'],
+  Report: ['Graffiti', 'Incident', 'Complaint', 'Suggestion', 'Pothole', 'Sinkhole', 'Trip Hazard', 'Crime', 'Theft', 'Disturbance', 'Danger', 'Crash', 'Dog Poop', 'UFO']
 };
 const defaultImageUrl = `${config.public.supabase.url}/storage/v1/object/public/images/public/items/default.jpg`;
 
