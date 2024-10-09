@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col w-[94%]">
     <Head title="Register" />
-    <h1 class="my-4 text-center text-2xl"><i><u><b>Lost</b></u></i> or<br /><i><u><b>Found</b></u></i> something?<br /> just <i><u><b>Report</b></u></i> it!</h1>
+    <h1 class="my-2 text-center text-2xl"><i><u><b>Lost</b></u></i> or<br /><i><u><b>Found</b></u></i> something?<br /> just <i><u><b>Report</b></u></i> it!</h1>
     <div class="w-full mx-auto bg-white border mb-12 p-3 rounded-lg">
       <form @submit.prevent="submitForm">
         <div class="grid place-items-center">
@@ -17,27 +17,33 @@
         <TextInput name="Title" v-model="form.item_name" :message="form.errors.item_name" />
         <TextInput name="Description" v-model="form.item_description" :message="form.errors.item_description" />
         <!-- Status dropdown -->
-        <div class="mb-6">
-          <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-          <select id="status" v-model="form.item_status" class="w-[270px] flex mt-1 block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            <option v-for="status in statuses" :key="status">{{ status }}</option>
-          </select>
-          <small class="text-red-700 mt-2">{{ form.errors.item_status }}</small>
-        </div>
-        <!-- Type dropdown -->
-        <div class="mb-6">
-          <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
-          <select id="type" v-model="form.item_type" class="w-[270px] flex mt-1 block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            <option v-for="type in typesMap[form.item_status] ?? []" :key="type">{{ type }}</option>
-          </select>
-          <small class="text-red-700 mt-2">{{ form.errors.item_type }}</small>
-        </div>
-        <div class="flex flex-row">
-          <TextInput name="Date" type="date" class="w-50 mr-2" v-model="form.reported_on" :message="form.errors.reported_on" />
-          <TextInput name="Time" type="time" v-model="form.reported_at" :message="form.errors.reported_at" />
+        <div class="flex md:flex-row flex-col items-center">
+          <div class="mb-6 flex flex-col w-full mx-auto items-center">
+            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+            <select id="status" v-model="form.item_status" class="w-[270px] flex mt-1 block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <option v-for="status in statuses" :key="status">{{ status }}</option>
+            </select>
+            <small class="text-red-700 mt-2">{{ form.errors.item_status }}</small>
+          </div>
+          <!-- Type dropdown -->
+          <div class="mb-6 flex flex-col w-full mx-auto items-center">
+            <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
+            <select id="type" v-model="form.item_type" class="w-[270px] flex mt-1 block py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <option v-for="type in typesMap[form.item_status] ?? []" :key="type">{{ type }}</option>
+            </select>
+            <small class="text-red-700 mt-2">{{ form.errors.item_type }}</small>
+          </div>
+          <div class="flex flex-row">
+            <TextInput name="Date" type="date" class="w-50 mr-2" v-model="form.reported_on" :message="form.errors.reported_on" />
+            <TextInput name="Time" type="time" v-model="form.reported_at" :message="form.errors.reported_at" />
+          </div>
         </div>
         <div id="layout">
-          <Map :height="350" :width="285" @update:coordinates="updateCoordinates" class="mt-4" />
+          <!-- <Map :height="350" :width="285" @update:coordinates="updateCoordinates" class="mt-4" /> -->
+          <Map 
+            @update:coordinates="updateCoordinates" 
+            class="mt-4 w-100 flex" 
+          />
         </div>
         <div class="flex w-100 justify-center mx-auto">
           <div class="bg-green-500 text-white font-bold primary-btn mt-32 w-50 p-2 rounded mb-4 text-sm cursor-pointer" @click="getCurrentLocation">Get current location</div>
@@ -397,8 +403,5 @@ const updateCoordinates = ({ lng, lat }: { lng: number, lat: number }) => {
   flex: 1;
   display: block;
   position: relative;
-  width: 280px;
-  height: 285px;
-  margin-bottom: 20px;
 }
 </style>

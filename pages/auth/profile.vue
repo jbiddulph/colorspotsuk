@@ -10,17 +10,17 @@
     </div>
     <ul class="flex flex-row w-full flex-wrap gap-0 md:gap-6 justify-evenly">
       <li v-for="item in items" :key="item.id" class="bg-white m-4 md:m-0 border border-slate-300 rounded-lg md:w-[182px] w-full p-4 flex flex-col">
-        <img :src="`${config.public.supabase.url}/storage/v1/object/public/images/${item.item_pic ? item.item_pic : 'public/images/public/items/default.jpg'}`" alt="Avatar" class="m-0 pr-2 h-auto md:h-32">
+        <img :src="`${config.public.supabase.url}/storage/v1/object/public/images/${item.item_pic ? item.item_pic : 'public/images/public/items/default.jpg'}`" alt="Avatar" class="m-0 w-full md:w-full object-cover aspect-[16/9]">
         <!-- {{item.id}} -->
         {{item.item_name}}
         {{item.item_status}}
         {{item.item_type}}
         <div class="flex flex-row mr-2">
-          <NuxtLink :href="`/items/update?id=${item.id}&user_id=${item.user_id}`" class="bg-amber-500 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2">
-            <span>Edit</span>
+          <NuxtLink :href="`/items/update?id=${item.id}&user_id=${item.user_id}`" class="bg-amber-500 hover:bg-gray-400 text-white font-bold py-1 px-2 rounded inline-flex items-center mr-2">
+            <small>Edit</small>
           </NuxtLink>
-          <button @click="deleteItem(item.id, item.item_pic)" class="bg-red-600 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded inline-flex items-center mr-2">
-            <span>Delete</span>
+          <button @click="deleteItem(item.id, item.item_pic)" class="bg-red-600 hover:bg-gray-400 text-white font-bold py-1 px-2 rounded inline-flex items-center mr-2">
+            <small>Delete</small>
           </button>
         </div>
       </li>

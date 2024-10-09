@@ -54,9 +54,9 @@ const mapContainerClasses = computed(() => {
   return [
     'map-container',
     'w-[100%] mx-auto',
-    'h-[400px]',
+    'md:h-[68vh]',
     'md:w-full',
-    'md:h-100',
+    'h-[430px]',
   ].join(' ');
 });
 
@@ -99,7 +99,7 @@ const addMarkers = () => {
       const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
         <div class="w-auto h-32 flex flex-row p-0 m-0">
           <div>
-            <img src="${config.public.supabase.url}/storage/v1/object/public/images/${imageUrl}" alt="Avatar" class="m-0 pr-2 h-32">
+            <img src="${config.public.supabase.url}/storage/v1/object/public/images/${imageUrl}" alt="Avatar" class="m-0 pr-2 aspect-[4/3]">
           </div>
           <div>
             <h3 class="text-2xl p-0 m-0">${item.item_name || 'No Title'}</h3>
