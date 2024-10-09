@@ -1,5 +1,19 @@
 <template>
   <div>
+    <!-- Modal for full image -->
+    <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
+      <div class="relative">
+        <img 
+          :src="`${config.public.supabase.url}/storage/v1/object/public/images/${modalImage ? modalImage : 'public/images/public/items/default.jpg'}`" 
+          alt="Full Image" 
+          class="max-w-full max-h-screen object-contain"
+        />
+        <!-- Close Button -->
+        <button @click="closeModal" class="absolute top-2 right-2 text-white text-2xl font-bold">
+          &times;
+        </button>
+      </div>
+    </div>
     <div v-if="showSidebar" id="sidebar">Lng: {{ location.lng }} | Lat: {{ location.lat }} | Z: {{ location.zoom }}</div>
     <div ref="mapContainer" :class="mapContainerClasses">
       <div class="crosshair"></div>
@@ -11,7 +25,19 @@
 import { ref, reactive, computed, onMounted, watch } from 'vue';
 import mapboxgl from 'mapbox-gl';
 import { useLocationStore } from "../stores/location";
+// Modal state
+const isModalOpen = ref(false);
+const modalImage = ref(null);
+// Function to open modal and set the clicked image
+const openModal = (image) => {
+  modalImage.value = image || 'default.jpg'; // If no image, use default
+  isModalOpen.value = true;
+};
 
+// Function to close the modal
+const closeModal = () => {
+  isModalOpen.value = false;
+};
 const props = defineProps({
   width: {
     type: Number,
@@ -99,7 +125,12 @@ const addMarkers = () => {
       const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
         <div class="w-auto h-32 flex flex-row p-0 m-0">
           <div>
-            <img src="${config.public.supabase.url}/storage/v1/object/public/images/${imageUrl}" alt="Avatar" class="m-0 pr-2 aspect-[4/3]">
+            <img 
+              src="${config.public.supabase.url}/storage/v1/object/public/images/${imageUrl}" 
+              alt="Avatar" 
+              class="m-0 pr-2 aspect-[4/3] cursor-pointer" 
+              onclick="openImageModal('${imageUrl}')"
+            >
           </div>
           <div>
             <h3 class="text-2xl p-0 m-0">${item.item_name || 'No Title'}</h3>
@@ -115,6 +146,11 @@ const addMarkers = () => {
 };
 
 onMounted(() => {
+  // Define the global function BEFORE map and popup setup
+  window.openImageModal = (imageUrl) => {
+    openModal(imageUrl);
+  };
+
   if (mapContainer.value) {
     map.value = new mapboxgl.Map({
       container: mapContainer.value,
@@ -143,6 +179,7 @@ onMounted(() => {
     mapContainer.value.appendChild(crosshair);
   }
 });
+
 
 watch([() => locationStore.latitude, () => locationStore.longitude], ([latitude, longitude]) => {
   console.log("xxlatitude: ", latitude);

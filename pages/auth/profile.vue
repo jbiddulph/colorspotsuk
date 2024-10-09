@@ -10,7 +10,31 @@
     </div>
     <ul class="flex flex-row w-full flex-wrap gap-0 md:gap-6 justify-evenly">
       <li v-for="item in items" :key="item.id" class="bg-white m-4 md:m-0 border border-slate-300 rounded-lg md:w-[182px] w-full p-4 flex flex-col">
-        <img :src="`${config.public.supabase.url}/storage/v1/object/public/images/${item.item_pic ? item.item_pic : 'public/images/public/items/default.jpg'}`" alt="Avatar" class="m-0 w-full md:w-full object-cover aspect-[16/9]">
+        <div>
+          <!-- Clickable Image -->
+          <img 
+            :src="`${config.public.supabase.url}/storage/v1/object/public/images/${item.item_pic ? item.item_pic : 'public/images/public/items/default.jpg'}`" 
+            alt="Avatar" 
+            class="m-0 w-full md:w-full object-cover aspect-[16/9] cursor-pointer"
+            @click="openModal(item.item_pic)"
+          />
+
+          <!-- Modal for full image -->
+          <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
+            <div class="relative">
+              <img 
+                :src="`${config.public.supabase.url}/storage/v1/object/public/images/${modalImage ? modalImage : 'public/images/public/items/default.jpg'}`" 
+                alt="Full Image" 
+                class="max-w-full max-h-screen object-contain"
+              />
+              <!-- Close Button -->
+              <button @click="closeModal" class="absolute top-2 right-2 text-white text-2xl font-bold">
+                &times;
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- <img :src="`${config.public.supabase.url}/storage/v1/object/public/images/${item.item_pic ? item.item_pic : 'public/images/public/items/default.jpg'}`" alt="Avatar" class="m-0 w-full md:w-full object-cover aspect-[16/9]"> -->
         <!-- {{item.id}} -->
         {{item.item_name}}
         {{item.item_status}}
@@ -44,6 +68,19 @@ const items = ref([]);
 const user = useSupabaseUser();
 const client = useSupabaseClient();
 const router = useRouter();
+const isModalOpen = ref(false);
+const modalImage = ref(null);
+
+// Function to open modal and set the clicked image
+const openModal = (image) => {
+  modalImage.value = image || 'default.jpg'; // If no image, use default
+  isModalOpen.value = true;
+};
+
+// Function to close the modal
+const closeModal = () => {
+  isModalOpen.value = false;
+};
 
 const totalItems = ref(0);
 const totalPages = ref(1);
